@@ -33,6 +33,10 @@ const CheckIfExist_Username = async (username: any) => {
         const res = await pool.query("SELECT id FROM users where username = $1", [username])
         return res.rows.length > 0;
 }
+const GetUserId = async (email: any) => {
+    const res = await pool.query("SELECT id FROM users where email = $1", [email])
+    return res.rows[0].id
+}
 
 const CreateAccount = (body: any) => { 
     return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
@@ -69,11 +73,41 @@ const CreateAccount = (body: any) => {
     })
 }
 
-// const GetUserInfo = (body: any){
+const GetUserInfo = (eyo: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try 
+        {
 
-// }
+            const email = eyo
+            const data = await GetUserId(email)
+            const response = await pool.query("SELECT username FROM users WHERE users.id = $1", [data]);
+            resolve(response.rows[0].username)
+        } 
+        catch (error: unknown) 
+        {
+            reject("Acces Denied")
+        }
+    })
+}
+
+const GetUserExercises = (eyo: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const email = eyo
+            const data = await GetUserId(email)
+            const response = await pool.query("SELECT name, description FROM exercises WHERE user_id = $1", [data]);
+            resolve(response.rows)
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Acces Denied")
+        }
+    })
+}
 
 module.exports = {
     GetUserPassword,
-    CreateAccount
+    CreateAccount,
+    GetUserInfo,
+    GetUserExercises
 }

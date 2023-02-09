@@ -7,7 +7,6 @@ const privateRoutes = () => {
         let flag = false;
 
         localStorage.getItem("token") ? flag = true : flag = false
-        console.log(localStorage.getItem("token"))
         return flag
     }
 

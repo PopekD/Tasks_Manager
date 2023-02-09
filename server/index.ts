@@ -47,8 +47,36 @@ app.post('/api/register', async(req: Request, res: Response) => {
     }
 })
 
-app.get('api/GetUserInfo', async(req: Request, res: Response)=> {
+app.post('/api/GetUsername', (req: Request, res: Response)=> {
+
+    jwt.verify(req.body.token, process.env.TOKEN_SECRET as string, async (err: any, user: any) => {
+        try {
+            const response = await db.GetUserInfo(user.user)
+            const data = await response
+            res.send(data)
+        }
+        catch(e)
+        {
+            res.send(e)
+        }
+
+    })
     
+})
+
+app.post('/api/GetExercises', (req: Request, res: Response) => {
+
+    jwt.verify(req.body.token, process.env.TOKEN_SECRET as string, async (err: any, user: any) => {
+        try {
+            const response = await db.GetUserExercises(user.user)
+            res.send(response)
+        }
+        catch (e) {
+            res.send(e)
+        }
+
+    })
+
 })
 
 const port = process.env.PORT || 8000;

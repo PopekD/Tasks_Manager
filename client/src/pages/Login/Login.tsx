@@ -20,8 +20,10 @@ const Login: FC = () => {
     })
       .then((res) => {
         if (res.ok) {
-          const token = res.json();
-          localStorage.setItem("token", token.toString())
+          const token = res.json()
+          .then((e) => {
+            localStorage.setItem("token", e.valueOf())
+          })
           navigate("/")
 
         } else {

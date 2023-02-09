@@ -41,6 +41,10 @@ const CheckIfExist_Username = (username) => __awaiter(void 0, void 0, void 0, fu
     const res = yield pool.query("SELECT id FROM users where username = $1", [username]);
     return res.rows.length > 0;
 });
+const GetUserId = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield pool.query("SELECT id FROM users where email = $1", [email]);
+    return res.rows[0].id;
+});
 const CreateAccount = (body) => {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -70,8 +74,42 @@ const CreateAccount = (body) => {
         });
     });
 };
+const GetUserInfo = (eyo) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const email = eyo;
+                const data = yield GetUserId(email);
+                const response = yield pool.query("SELECT username FROM users WHERE users.id = $1", [data]);
+                resolve(response.rows[0].username);
+            }
+            catch (error) {
+                reject("Acces Denied");
+            }
+        });
+    });
+};
+const GetUserExercises = (eyo) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const email = eyo;
+                const data = yield GetUserId(email);
+                const response = yield pool.query("SELECT name, description FROM exercises WHERE user_id = $1", [data]);
+                console.log(response.rows);
+                resolve(response.rows);
+            }
+            catch (error) {
+                console.log(error);
+                reject("Acces Denied");
+            }
+        });
+    });
+};
 module.exports = {
     GetUserPassword,
-    CreateAccount
+    CreateAccount,
+    GetUserInfo,
+    GetUserExercises
 };
 //# sourceMappingURL=queries.js.map

@@ -47,6 +47,29 @@ app.post('/api/register', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(401).send(e);
     }
 }));
+app.post('/api/GetUsername', (req, res) => {
+    jwt.verify(req.body.token, process.env.TOKEN_SECRET, (err, user) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const response = yield db.GetUserInfo(user.user);
+            const data = yield response;
+            res.send(data);
+        }
+        catch (e) {
+            res.send(e);
+        }
+    }));
+});
+app.post('/api/GetExercises', (req, res) => {
+    jwt.verify(req.body.token, process.env.TOKEN_SECRET, (err, user) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const response = yield db.GetUserExercises(user.user);
+            res.send(response);
+        }
+        catch (e) {
+            res.send(e);
+        }
+    }));
+});
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
