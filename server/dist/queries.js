@@ -9,6 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const pool = new Pool({
     user: "postgres",
     host: "localhost",
@@ -31,7 +33,45 @@ const GetUserPassword = (body) => {
         });
     });
 };
+const CheckIfExist_Email = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield pool.query("SELECT id FROM users where email = $1", [email]);
+    return res.rows.length > 0;
+});
+const CheckIfExist_Username = (username) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield pool.query("SELECT id FROM users where username = $1", [username]);
+    return res.rows.length > 0;
+});
+const CreateAccount = (body) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const check_email = yield CheckIfExist_Email(body.email);
+            const check_username = yield CheckIfExist_Username(body.username);
+            const email = body.email;
+            const username = body.username;
+            const password = body.password;
+            try {
+                if (!check_email) {
+                    if (!check_username) {
+                        const hash = bcrypt.hashSync(password, saltRounds);
+                        yield pool.query("INSERT INTO users (email, password, username, created_at, updated_at) VALUES($1, $2, $3, NOW(), NOW());", [email, hash, username]);
+                        resolve("Account Created Successfully");
+                    }
+                    else {
+                        reject("Username Already Taken");
+                    }
+                }
+                else {
+                    reject("Email already taken");
+                }
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
+    });
+};
 module.exports = {
-    GetUserPassword
+    GetUserPassword,
+    CreateAccount
 };
 //# sourceMappingURL=queries.js.map

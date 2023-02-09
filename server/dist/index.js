@@ -13,27 +13,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const bcrypt = require("bcrypt");
 const app = (0, express_1.default)();
 const db = require('./queries');
 require('dotenv').config();
-console.log(process.env.TOKEN_SECRET);
 require('crypto').randomBytes(64).toString('hex');
-app.use(express_1.default.json());
 process.env.TOKEN_SECRET;
 const jwt = require('jsonwebtoken');
+app.use(express_1.default.json());
 function generateAccessToken(user) {
     return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 app.post('/api/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const databaseQuer = yield db.GetUserPassword(req.body.email);
-        if (databaseQuer == req.body.password) {
-            const token = generateAccessToken({ user: req.body.email });
-            res.json(token);
-        }
+        const databaseQuery = yield db.GetUserPassword(req.body.email);
+        bcrypt.compare(req.body.password, databaseQuery, function (err, result) {
+            if (result) {
+                const token = generateAccessToken({ user: req.body.email });
+                res.json(token);
+            }
+        });
     }
     catch (e) {
-        console.log(e);
+        res.status(401).send(e);
+    }
+}));
+app.post('/api/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const databaseQuery = yield db.CreateAccount(req.body);
+        res.sendStatus(200);
+    }
+    catch (e) {
         res.status(401).send(e);
     }
 }));
