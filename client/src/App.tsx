@@ -5,6 +5,7 @@ import Register from './pages/Register/Register'
 import PrivateRoute from './components/privateRoutes';
 import Profile from './pages/Profile/Profile'
 
+
 const App: React.FC = () => {
     return (
         <>

@@ -37,6 +37,14 @@ const GetUserId = async (email: any) => {
     const res = await pool.query("SELECT id FROM users where email = $1", [email])
     return res.rows[0].id
 }
+const GetUserId_Username = async (username: any) => {
+    const res = await pool.query("SELECT id FROM users where username = $1", [username])
+    return res.rows[0].id
+}
+const GetTask_ID = async (name: any) => {
+    const res = await pool.query("SELECT id FROM exercises where name = $1", [name])
+    return res.rows[0].id
+}
 
 const CreateAccount = (body: any) => { 
     return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
@@ -105,9 +113,61 @@ const GetUserExercises = (eyo: any) => {
     })
 }
 
+const SaveTask = (body: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const username = body.username;
+            const id = await GetUserId_Username(username)
+            const name = body.name;
+            const description = body.description;
+            await pool.query("INSERT INTO exercises (user_id, name, description, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW());", [id, name, description])
+            resolve("Success")
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Something went wrong")
+        }
+    })
+}
+const DeleteTask = (body: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const username = body.username;
+            const id = await GetUserId_Username(username)
+            const name = body.valueName;
+            await pool.query("DELETE FROM exercises WHERE name = $1 AND user_id = $2", [name, id])
+            resolve("Success")
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Something went wrong")
+        }
+    })
+
+}
+
+const ShareTask = (body: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const name = body.selectedOption;
+            const user_id = await GetUserId_Username(body.username);
+            const id = await GetTask_ID(name)
+            await pool.query("INSERT INTO shared_exercises (exercise_id, shared_by, created_at, updated_at) VALUES ($1, $2, NOW(), NOW());", [id, user_id])
+            resolve("Success")
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Something went wrong")
+        }
+    })
+}
+
 module.exports = {
     GetUserPassword,
     CreateAccount,
     GetUserInfo,
-    GetUserExercises
+    GetUserExercises,
+    SaveTask,
+    DeleteTask,
+    ShareTask
 }

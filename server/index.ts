@@ -79,6 +79,44 @@ app.post('/api/GetExercises', (req: Request, res: Response) => {
 
 })
 
+app.post('/api/saveTask', async (req: Request, res: Response) => {
+
+    try
+    {
+        const response = await db.SaveTask(req.body)
+        res.send(response)
+    }
+    catch(e)
+    {
+        res.send(e)
+    }
+
+})
+
+app.post('/api/DeleteTask', async (req: Request, res: Response) => {
+
+    try {
+        const response = await db.DeleteTask(req.body)
+        res.send(response)
+    }
+    catch (e) {
+        res.send(e)
+    }
+
+})
+
+app.post('/api/shareTask', async (req: Request, res: Response) => {
+
+    try {
+        const response = await db.ShareTask(req.body)
+        res.send(response)
+    }
+    catch (e) {
+        res.send(e)
+    }
+
+})
+
 const port = process.env.PORT || 8000;
 
 app.listen(port, () => {

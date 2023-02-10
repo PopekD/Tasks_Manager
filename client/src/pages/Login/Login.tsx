@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import toast, {Toaster} from 'react-hot-toast'
 
 
+
 const Login: FC = () => {
 
   const [email, setEmail] = useState<string>("");
@@ -20,7 +21,7 @@ const Login: FC = () => {
     })
       .then((res) => {
         if (res.ok) {
-          const token = res.json()
+          res.json()
           .then((e) => {
             localStorage.setItem("token", e.valueOf())
           })

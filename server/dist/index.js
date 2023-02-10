@@ -70,6 +70,33 @@ app.post('/api/GetExercises', (req, res) => {
         }
     }));
 });
+app.post('/api/saveTask', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield db.SaveTask(req.body);
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
+app.post('/api/DeleteTask', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield db.DeleteTask(req.body);
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
+app.post('/api/shareTask', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield db.ShareTask(req.body);
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

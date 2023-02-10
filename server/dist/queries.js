@@ -45,6 +45,14 @@ const GetUserId = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield pool.query("SELECT id FROM users where email = $1", [email]);
     return res.rows[0].id;
 });
+const GetUserId_Username = (username) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield pool.query("SELECT id FROM users where username = $1", [username]);
+    return res.rows[0].id;
+});
+const GetTask_ID = (name) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield pool.query("SELECT id FROM exercises where name = $1", [name]);
+    return res.rows[0].id;
+});
 const CreateAccount = (body) => {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -96,7 +104,6 @@ const GetUserExercises = (eyo) => {
                 const email = eyo;
                 const data = yield GetUserId(email);
                 const response = yield pool.query("SELECT name, description FROM exercises WHERE user_id = $1", [data]);
-                console.log(response.rows);
                 resolve(response.rows);
             }
             catch (error) {
@@ -106,10 +113,65 @@ const GetUserExercises = (eyo) => {
         });
     });
 };
+const SaveTask = (body) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const username = body.username;
+                const id = yield GetUserId_Username(username);
+                const name = body.name;
+                const description = body.description;
+                yield pool.query("INSERT INTO exercises (user_id, name, description, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW());", [id, name, description]);
+                resolve("Success");
+            }
+            catch (error) {
+                console.log(error);
+                reject("Something went wrong");
+            }
+        });
+    });
+};
+const DeleteTask = (body) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const username = body.username;
+                const id = yield GetUserId_Username(username);
+                const name = body.valueName;
+                yield pool.query("DELETE FROM exercises WHERE name = $1 AND user_id = $2", [name, id]);
+                resolve("Success");
+            }
+            catch (error) {
+                console.log(error);
+                reject("Something went wrong");
+            }
+        });
+    });
+};
+const ShareTask = (body) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const name = body.selectedOption;
+                const user_id = yield GetUserId_Username(body.username);
+                const id = yield GetTask_ID(name);
+                yield pool.query("INSERT INTO shared_exercises (exercise_id, shared_by, created_at, updated_at) VALUES ($1, $2, NOW(), NOW());", [id, user_id]);
+                resolve("Success");
+            }
+            catch (error) {
+                console.log(error);
+                reject("Something went wrong");
+            }
+        });
+    });
+};
 module.exports = {
     GetUserPassword,
     CreateAccount,
     GetUserInfo,
-    GetUserExercises
+    GetUserExercises,
+    SaveTask,
+    DeleteTask,
+    ShareTask
 };
 //# sourceMappingURL=queries.js.map
