@@ -22,7 +22,7 @@ process.env.TOKEN_SECRET;
 const jwt = require('jsonwebtoken');
 app.use(express_1.default.json());
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '9999 years' });
 }
 app.post('/api/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -70,9 +70,38 @@ app.post('/api/GetExercises', (req, res) => {
         }
     }));
 });
+app.post('/api/GetUserSharedExercises', (req, res) => {
+    jwt.verify(req.body.token, process.env.TOKEN_SECRET, (err, user) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const response = yield db.GetUserSharedExercises(user.user);
+            res.send(response);
+        }
+        catch (e) {
+            res.send(e);
+        }
+    }));
+});
+app.post('/api/GetSharedExercises', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield db.GetSharedExercises();
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
 app.post('/api/saveTask', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield db.SaveTask(req.body);
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
+app.post('/api/modifyTask', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield db.modifyTask(req.body);
         res.send(response);
     }
     catch (e) {
@@ -91,6 +120,15 @@ app.post('/api/DeleteTask', (req, res) => __awaiter(void 0, void 0, void 0, func
 app.post('/api/shareTask', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield db.ShareTask(req.body);
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
+app.post('/api/StopSharing', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield db.StopSharing(req.body);
         res.send(response);
     }
     catch (e) {

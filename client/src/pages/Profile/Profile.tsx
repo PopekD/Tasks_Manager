@@ -10,6 +10,8 @@ import home from '../../assets/home.png'
 import user from '../../assets/user.png'
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 
 
 const Profile: React.FC = () => {
@@ -20,14 +22,24 @@ const Profile: React.FC = () => {
     const [exercises, setExercises] = useState([{
         name: "", description: ""
     }]);
-    const [name, setName] = useState("")
-    const [description, setDescription] = useState("")
+    const [name, setName] = useState("");
+    const [modifiedName, setModifiedName] = useState("");
+    const [description, setDescription] = useState("");
+    const [modifiedDescription, setModifiedDescription] = useState("");
     const [selectedOption, setSelectedOption] = useState("");
+    const [task_name, setTask_name] = useState("");
+    const [sharedExercises, setsharedExercises] = useState([{
+        name: "", description: ""
+    }])
+    const [isLoading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(0)
     const PER_PAGE = 3
     const offset = currentPage * PER_PAGE;
     const pageCount = Math.ceil(exercises.length / PER_PAGE);
+    const sharedPageCount = Math.ceil(sharedExercises.length / PER_PAGE);
     
     function handlePageClick({ selected }: { selected: number }) {
         setCurrentPage(selected);
@@ -41,7 +53,7 @@ const Profile: React.FC = () => {
         const MyToast = (
             <div className='Toast'>
                 <p>{message}</p>
-                <Button size={'sm'} colorScheme="red" onClick={dismissToast}>Dismiss</Button>
+                <Button size={'sm'} colorScheme="red" onClick={dismissToast} style={{ alignSelf: 'center' }}>Dismiss</Button>
             </div>
             
         );
@@ -57,10 +69,6 @@ const Profile: React.FC = () => {
     }
 
 
-
-    const [isLoading, setLoading] = useState(true);
-    
-    const navigate = useNavigate();
 
     const fetchData_Username = async (): Promise<void> => {
 
@@ -106,22 +114,64 @@ const Profile: React.FC = () => {
         }
 
     }
+    const fetchData_SharedExercises = async (): Promise<any> => {
+
+        const token = await localStorage.getItem("token")
+
+
+        try {
+            const data = await fetch("/api/GetUserSharedExercises", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token }),
+            })
+            const response = await data.text()
+            if (response.valueOf() !== "[]") {
+                const e = JSON.parse(response.valueOf())
+                setsharedExercises(e)
+            }
+            setLoading(false)
+        }
+        catch (e) {
+            console.log(e)
+        }
+
+    }
 
     useEffect(() => {
         fetchData_Username()
         .then( () => fetchData_Exercises())
+        .then( () => fetchData_SharedExercises())
     }, [])
 
     const handleShare = async (event: any) => {
         event.preventDefault();
+        try
+        {
+            await fetch("/api/shareTask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ selectedOption, username }),
+            })
 
-        await fetch("/api/shareTask", {
+            return window.location.reload();
+        }
+        catch(e){
+            
+        }
+
+    }
+    const handleStopSharing = async (valueName: any) => {
+
+        await fetch("/api/StopSharing", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ selectedOption, username }),
+            body: JSON.stringify({ valueName, username }),
         })
+
         return window.location.reload();
     }
+
     const handleSubmit_Add = async (event: any) => {
         event.preventDefault();
 
@@ -132,6 +182,18 @@ const Profile: React.FC = () => {
         })
         
         return window.location.reload();
+    }
+    const handleModify = async (event: any) => {
+
+        event.preventDefault()
+        
+            await fetch("/api/modifyTask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ modifiedName, modifiedDescription, task_name, username }),
+            })
+
+            return window.location.reload();
     }
     const handleDelete = async (valueName: any) => {
 
@@ -205,6 +267,7 @@ const Profile: React.FC = () => {
                                             Which one would you like to share: 
                                         </label>
                                             <select value={selectedOption} onChange={e => setSelectedOption(e.target.value)}>
+                                            <option>Please Select The Task You Want To Share</option>
                                                 {exercises.map(option => (
                                                     <option  value={option.name}>
                                                         {option.name}
@@ -224,35 +287,113 @@ const Profile: React.FC = () => {
                         </div>
 
                     </div>
+
                     <div className='profileBottomContainer'>
                         <div className='profileBottomContainer-left'>
-                            <h1 className='profileBottomContainer-left-text'>Your Assignments</h1>
-                            <div className='profileBottomContainer-left-tasks'>
-                                {Object.entries(exercises).slice(offset, offset + PER_PAGE)
-                                .map(([key, value]) => {
-                                    return (
-                                        <div key={key}>         
-                                            <Button colorScheme={'green'} size="lg" className='taskButtons' onClick={() => showToastWithButton(value.description)
-                                            }>{value.name}</Button>
-                                            <div className='modify-delete-buttons-div'>
-                                                <Button size={'xs'} colorScheme='red' onClick={() =>handleDelete(value.name)}>DELETE</Button>
-                                                <Button size={'xs'} colorScheme='yellow'>MODIFY</Button>
+                            <Tabs style={{minHeight: '400px'}}> 
+                                <TabList>
+                                    <Tab> <h1 className='profileBottomContainer-left-text'>Your Assignments</h1> </Tab>
+                                    <Tab> <h1 className='profileBottomContainer-left-text'>Shared Assignments</h1> </Tab>
+                                </TabList>
+                            <TabPanel>
+                                <div className='profileBottomContainer-left-tasks'>
+                                    {
+                                        exercises.length !== 0 && exercises[0].name !== "" ?
+                                            Object.entries(exercises).slice(offset, offset + PER_PAGE)
+                                                .map(([key, value]) => {
+                                                    return (
+                                                        <div key={key}>
+                                                            <Button colorScheme={'whatsapp'} size="lg" className='taskButtons' onClick={() => showToastWithButton(value.description)
+                                                            }>{value.name}</Button>
+                                                            <div className='modify-delete-buttons-div'>
+                                                                <Button size={'xs'} colorScheme='red' onClick={() => handleDelete(value.name)}>DELETE</Button>
+                                                                <Popup trigger={<Button size={'xs'} colorScheme='yellow' onClickCapture={() => {
+                                                                    setModifiedDescription(value.description)
+                                                                    setModifiedName(value.name)
+                                                                    setTask_name(value.name)
+                                                                }
+                                                                }>MODIFY</Button>} modal>
+                                                                    <form onSubmit={
+                                                                        handleModify} className='form'>
+                                                                        <label>
+                                                                            Name:
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={modifiedName}
+                                                                            onChange={(event) => setModifiedName(event.target.value)}
+                                                                            required
+                                                                        />
+                                                                        <br />
+                                                                        <label>
+                                                                            Description:
+                                                                        </label>
+                                                                        <textarea
+                                                                            value={modifiedDescription}
+                                                                            onChange={(event) => setModifiedDescription(event.target.value)}
+                                                                            required
+                                                                        />
+                                                                        <br />
+                                                                        <Button colorScheme={'green'} size={'lg'} style={{ alignSelf: 'center', marginTop: "3%", fontSize: "1.5em" }} type="submit">Submit</Button>
+                                                                    </form>
+                                                                </Popup>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            :
+                                            <div>
+
                                             </div>
-                                        </div>
-                                    );
-                                })}  
-                            </div>
-                            <ReactPaginate
-                                previousLabel={""}
-                                nextLabel={""}
-                                pageCount={pageCount}
-                                onPageChange={handlePageClick}
-                                containerClassName={"pagination"}
-                                previousLinkClassName={"pagination__link"}
-                                nextLinkClassName={"pagination__link"}
-                                disabledClassName={"pagination__link__disabled"}
-                                activeClassName={"pagination__link--active"}
-                            />
+                                    }
+                                </div>
+                                <ReactPaginate
+                                    previousLabel={""}
+                                    nextLabel={""}
+                                    pageCount={pageCount}
+                                    onPageChange={handlePageClick}
+                                    containerClassName={"pagination"}
+                                    previousLinkClassName={"pagination__link"}
+                                    nextLinkClassName={"pagination__link"}
+                                    disabledClassName={"pagination__link__disabled"}
+                                    activeClassName={"pagination__link--active"}
+                                />
+                            </TabPanel>
+                            <TabPanel>
+                                    <div className='profileBottomContainer-left-tasks'>
+                                        {
+                                            sharedExercises.length !== 0 && sharedExercises[0].name !== "" ?
+                                                Object.entries(sharedExercises).slice(offset, offset + PER_PAGE)
+                                                    .map(([key, value]) => {
+                                                        return (
+                                                            <div key={key}>
+                                                                <Button colorScheme={'whatsapp'} size="lg" className='taskButtons' onClick={() => showToastWithButton(value.description)
+                                                                }>{value.name}</Button>
+                                                                <div className='modify-delete-buttons-div'>
+                                                                    <Button size={'xs'} colorScheme='red' onClick={() => handleStopSharing(value.name)}>Stop Sharing</Button>              
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                :
+                                                <div>
+
+                                                </div>
+                                        }
+                                    </div>
+                                    <ReactPaginate
+                                        previousLabel={""}
+                                        nextLabel={""}
+                                        pageCount={sharedPageCount}
+                                        onPageChange={handlePageClick}
+                                        containerClassName={"pagination"}
+                                        previousLinkClassName={"pagination__link"}
+                                        nextLinkClassName={"pagination__link"}
+                                        disabledClassName={"pagination__link__disabled"}
+                                        activeClassName={"pagination__link--active"}
+                                    />
+                            </TabPanel>
+                        </Tabs>
                         </div>
                         <div className='profileBottomContainer-right'>
                             

@@ -103,7 +103,7 @@ const GetUserExercises = (eyo: any) => {
         try {
             const email = eyo
             const data = await GetUserId(email)
-            const response = await pool.query("SELECT name, description FROM exercises WHERE user_id = $1", [data]);
+            const response = await pool.query("SELECT name, description FROM exercises WHERE user_id = $1 AND shared = false", [data]);
             resolve(response.rows)
         }
         catch (error: unknown) {
@@ -111,6 +111,21 @@ const GetUserExercises = (eyo: any) => {
             reject("Acces Denied")
         }
     })
+}
+const GetUserSharedExercises = (eyo: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const email = eyo
+            const data = await GetUserId(email)
+            const response = await pool.query("SELECT name, description FROM exercises WHERE user_id = $1 AND shared = true", [data]);
+            resolve(response.rows)
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Acces Denied")
+        }
+    })
+
 }
 
 const SaveTask = (body: any) => {
@@ -129,6 +144,29 @@ const SaveTask = (body: any) => {
         }
     })
 }
+
+const modifyTask = (body: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+
+            const username = body.username;
+            const name = body.task_name
+
+            const user_id = await GetUserId_Username(username)
+            const task_id = await GetTask_ID(name)
+
+            const modifiedName = body.modifiedName;
+            const modifiedDescription = body.modifiedDescription;
+            await pool.query("UPDATE exercises SET name = $1, description = $2, updated_at = NOW() WHERE id = $3 AND user_id = $4", [modifiedName, modifiedDescription, task_id, user_id])
+            resolve("Success")
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Something went wrong")
+        }
+    })
+}
+
 const DeleteTask = (body: any) => {
     return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
         try {
@@ -153,7 +191,37 @@ const ShareTask = (body: any) => {
             const user_id = await GetUserId_Username(body.username);
             const id = await GetTask_ID(name)
             await pool.query("INSERT INTO shared_exercises (exercise_id, shared_by, created_at, updated_at) VALUES ($1, $2, NOW(), NOW());", [id, user_id])
+            await pool.query("UPDATE exercises SET shared = true WHERE id = $1 AND user_id = $2", [id, user_id])
             resolve("Success")
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Something went wrong")
+        }
+    })
+}
+const StopSharing = (body: any) => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const name = body.valueName;
+            const user_id = await GetUserId_Username(body.username);
+            const task_id = await GetTask_ID(name)
+            await pool.query("DELETE FROM shared_exercises WHERE exercise_id = $1 AND shared_by = $2;", [task_id, user_id])
+            await pool.query("UPDATE exercises SET shared = false WHERE id = $1 AND user_id = $2", [task_id, user_id])
+            resolve("Success")
+        }
+        catch (error: unknown) {
+            console.log(error)
+            reject("Something went wrong")
+        }
+    })
+}
+
+const GetSharedExercises = () => {
+    return new Promise(async function (resolve: (value: unknown) => void, reject: (reason?: any) => void) {
+        try {
+            const response = await pool.query("SELECT users.username, exercises.name, exercises.description FROM users JOIN shared_exercises ON users.id = shared_exercises.shared_by JOIN exercises ON exercises.id = shared_exercises.exercise_id;")
+            resolve(response.rows)
         }
         catch (error: unknown) {
             console.log(error)
@@ -169,5 +237,9 @@ module.exports = {
     GetUserExercises,
     SaveTask,
     DeleteTask,
-    ShareTask
+    ShareTask,
+    modifyTask, 
+    GetSharedExercises,
+    GetUserSharedExercises,
+    StopSharing
 }

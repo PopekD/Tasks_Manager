@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast'
-
+import { Button, ButtonGroup } from "@chakra-ui/button"
+import './Register.css'
 const  Register: React.FC = () => {
 
 
@@ -39,39 +40,46 @@ const  Register: React.FC = () => {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Email:
+        <div className='App'>
+            <form onSubmit={handleSubmit} className='RegForm'>
+                <label style={{
+                    fontWeight: 'bolder',
+                    fontSize: '32px',
+                    color: 'black'
+                }}>
+                    CREATE ACCOUNT
+                </label>
                     <input
                         type="email"
+                        placeholder='Email'
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         required
                     />
-                </label>
+
                 <br />
-                <label>
-                    Username:
+
                     <input
                         type="text"
+                        placeholder='Username'
                         value={username}
                         onChange={(event) => setUsername(event.target.value)}
                         required
                     />
-                </label>
+
                 <br />
-                <label>
-                    Password:
+
                     <input
                         type="password"
+                        placeholder='Password'
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
                         required
                     />
-                </label>
+
                 <br />
-                <button type="submit">Log In</button>
+                <a onClick={() => navigate("/Login")} style={{ cursor: 'pointer', display: 'flex', alignSelf: "center" }}> <u>Already Have An Account ? Click<b> Here </b> </u></a>
+                <Button colorScheme={'facebook'} size="lg" style={{ alignSelf: "center", minWidth: "10vw" }} type="submit">Submit</Button>
             </form>
             <Toaster/>
         </div>

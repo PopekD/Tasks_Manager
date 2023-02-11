@@ -103,7 +103,23 @@ const GetUserExercises = (eyo) => {
             try {
                 const email = eyo;
                 const data = yield GetUserId(email);
-                const response = yield pool.query("SELECT name, description FROM exercises WHERE user_id = $1", [data]);
+                const response = yield pool.query("SELECT name, description FROM exercises WHERE user_id = $1 AND shared = false", [data]);
+                resolve(response.rows);
+            }
+            catch (error) {
+                console.log(error);
+                reject("Acces Denied");
+            }
+        });
+    });
+};
+const GetUserSharedExercises = (eyo) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const email = eyo;
+                const data = yield GetUserId(email);
+                const response = yield pool.query("SELECT name, description FROM exercises WHERE user_id = $1 AND shared = true", [data]);
                 resolve(response.rows);
             }
             catch (error) {
@@ -122,6 +138,26 @@ const SaveTask = (body) => {
                 const name = body.name;
                 const description = body.description;
                 yield pool.query("INSERT INTO exercises (user_id, name, description, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW());", [id, name, description]);
+                resolve("Success");
+            }
+            catch (error) {
+                console.log(error);
+                reject("Something went wrong");
+            }
+        });
+    });
+};
+const modifyTask = (body) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const username = body.username;
+                const name = body.task_name;
+                const user_id = yield GetUserId_Username(username);
+                const task_id = yield GetTask_ID(name);
+                const modifiedName = body.modifiedName;
+                const modifiedDescription = body.modifiedDescription;
+                yield pool.query("UPDATE exercises SET name = $1, description = $2, updated_at = NOW() WHERE id = $3 AND user_id = $4", [modifiedName, modifiedDescription, task_id, user_id]);
                 resolve("Success");
             }
             catch (error) {
@@ -156,7 +192,40 @@ const ShareTask = (body) => {
                 const user_id = yield GetUserId_Username(body.username);
                 const id = yield GetTask_ID(name);
                 yield pool.query("INSERT INTO shared_exercises (exercise_id, shared_by, created_at, updated_at) VALUES ($1, $2, NOW(), NOW());", [id, user_id]);
+                yield pool.query("UPDATE exercises SET shared = true WHERE id = $1 AND user_id = $2", [id, user_id]);
                 resolve("Success");
+            }
+            catch (error) {
+                console.log(error);
+                reject("Something went wrong");
+            }
+        });
+    });
+};
+const StopSharing = (body) => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const name = body.valueName;
+                const user_id = yield GetUserId_Username(body.username);
+                const task_id = yield GetTask_ID(name);
+                yield pool.query("DELETE FROM shared_exercises WHERE exercise_id = $1 AND shared_by = $2;", [task_id, user_id]);
+                yield pool.query("UPDATE exercises SET shared = false WHERE id = $1 AND user_id = $2", [task_id, user_id]);
+                resolve("Success");
+            }
+            catch (error) {
+                console.log(error);
+                reject("Something went wrong");
+            }
+        });
+    });
+};
+const GetSharedExercises = () => {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield pool.query("SELECT users.username, exercises.name, exercises.description FROM users JOIN shared_exercises ON users.id = shared_exercises.shared_by JOIN exercises ON exercises.id = shared_exercises.exercise_id;");
+                resolve(response.rows);
             }
             catch (error) {
                 console.log(error);
@@ -172,6 +241,10 @@ module.exports = {
     GetUserExercises,
     SaveTask,
     DeleteTask,
-    ShareTask
+    ShareTask,
+    modifyTask,
+    GetSharedExercises,
+    GetUserSharedExercises,
+    StopSharing
 };
 //# sourceMappingURL=queries.js.map

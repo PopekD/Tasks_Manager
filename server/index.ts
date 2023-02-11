@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 function generateAccessToken(user: any) {
-    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '9999 years' });
 }
 
 
@@ -78,6 +78,32 @@ app.post('/api/GetExercises', (req: Request, res: Response) => {
     })
 
 })
+app.post('/api/GetUserSharedExercises', (req: Request, res: Response) => {
+
+    jwt.verify(req.body.token, process.env.TOKEN_SECRET as string, async (err: any, user: any) => {
+        try {
+            const response = await db.GetUserSharedExercises(user.user)
+            res.send(response)
+        }
+        catch (e) {
+            res.send(e)
+        }
+
+    })
+
+})
+
+app.post('/api/GetSharedExercises', async(req: Request, res: Response) => {
+    try
+    {
+        const response = await db.GetSharedExercises()
+        res.send(response)
+    }
+    catch(e)
+    {
+        res.send(e)
+    }
+})
 
 app.post('/api/saveTask', async (req: Request, res: Response) => {
 
@@ -92,6 +118,19 @@ app.post('/api/saveTask', async (req: Request, res: Response) => {
     }
 
 })
+
+app.post('/api/modifyTask', async (req: Request, res: Response) => {
+
+    try {
+        const response = await db.modifyTask(req.body)
+        res.send(response)
+    }
+    catch (e) {
+        res.send(e)
+    }
+
+})
+
 
 app.post('/api/DeleteTask', async (req: Request, res: Response) => {
 
@@ -109,6 +148,18 @@ app.post('/api/shareTask', async (req: Request, res: Response) => {
 
     try {
         const response = await db.ShareTask(req.body)
+        res.send(response)
+    }
+    catch (e) {
+        res.send(e)
+    }
+
+})
+
+app.post('/api/StopSharing', async (req: Request, res: Response) => {
+
+    try {
+        const response = await db.StopSharing(req.body)
         res.send(response)
     }
     catch (e) {

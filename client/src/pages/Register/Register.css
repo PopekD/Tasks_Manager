@@ -1,0 +1,19 @@
+.RegForm {
+    position: absolute;
+    background-color: #F59159;
+    width: 560px;
+    height: 590px;
+    border-radius: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+.RegForm >  input {
+    align-self: center;
+     border: 0;
+     width: 316px;
+     height: 58px;
+    box-shadow: 0px 4px 4px 0px #00000040;
+     background-color: #D9D9D9;
+    font-size: 1.5em;
+}

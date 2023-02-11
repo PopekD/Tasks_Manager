@@ -2,6 +2,7 @@ import React, {FC, useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import toast, {Toaster} from 'react-hot-toast'
+import { Button, ButtonGroup } from "@chakra-ui/button"
 
 
 
@@ -25,8 +26,7 @@ const Login: FC = () => {
           .then((e) => {
             localStorage.setItem("token", e.valueOf())
           })
-          navigate("/")
-
+            .then(() => navigate("/"))
         } else {
           toast.error("Incorrect Username or Password")
         }
@@ -38,26 +38,32 @@ const Login: FC = () => {
 
   return (
     <div className="App">
-      <form onSubmit={handleSubmit}>
-        <label>
-          Email:
+      <form onSubmit={handleSubmit} className="LoginForm">
+          <label style={{ 
+            fontWeight: 'bolder',
+            fontSize: '32px',
+            color: 'black'
+          }}>
+            LOGIN
+          </label>
+          <div> 
           <input
+            placeholder='Email'
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
-        </label>
-        <br />
-        <label>
-          Password:
+          <br />
           <input
+            placeholder='Password'
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
-        </label>
+          </div>
         <br />
-        <button type="submit">Log In</button>
+        <a onClick={() => navigate("/Register")} style={{ cursor: 'pointer', display: 'flex', alignSelf: "center" }}><u> Create Account  <b> Here</b> </u></a>
+        <Button colorScheme={'facebook'} size="lg" style={{alignSelf: "center", minWidth: "10vw"}} type="submit">Log In</Button>
       </form>
       <Toaster />
     </div>
