@@ -8,9 +8,9 @@ A simple task sharing application made for slush2023 junior fullstack developer 
 
 # Server posted on Heroku, Database on Amazon RDS
 
-# Made in React / TypeScript Libraries (client), NodeJs, Expressjs, Postgresql (Server) 
+Made in React / TypeScript Libraries (client), NodeJs, Expressjs, Postgresql (Server) 
 
-Libraries //
+# Libraries //
 
 Server:
 
