@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
-const bcrypt = require("bcrypt")
-
+const bcrypt = require("bcryptjs")
+const path = require('path');
 const app: Express = express();
 const db = require('./queries')
 require('dotenv').config()
@@ -11,12 +11,15 @@ const jwt = require('jsonwebtoken');
 
 
 app.use(express.json());
-
+app.use(express.static("public"))
 
 function generateAccessToken(user: any) {
     return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '9999 years' });
 }
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public/index.html'));
+});
 
 app.post('/api/login', async (req: Request, res: Response) => {
    try

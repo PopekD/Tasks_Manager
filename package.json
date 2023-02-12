@@ -1,7 +1,0 @@
-{
-    "scripts": {
-        "start-client": "npm run build && serve -s build",
-        "start-server": "node server/dist/index.js"
-    }
-
-}

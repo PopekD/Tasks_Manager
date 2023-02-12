@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bcrypt = require("bcrypt");
+const path = require('path');
 const app = (0, express_1.default)();
 const db = require('./queries');
 require('dotenv').config();
@@ -21,9 +22,13 @@ require('crypto').randomBytes(64).toString('hex');
 process.env.TOKEN_SECRET;
 const jwt = require('jsonwebtoken');
 app.use(express_1.default.json());
+app.use(express_1.default.static("public"));
 function generateAccessToken(user) {
     return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '9999 years' });
 }
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public/index.html'));
+});
 app.post('/api/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const databaseQuery = yield db.GetUserPassword(req.body.email);

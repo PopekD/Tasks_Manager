@@ -13,9 +13,9 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const pool = new Pool({
     user: "postgres",
-    host: "localhost",
-    database: "Slush",
-    password: "root",
+    host: "slush.cjyaty8k3acu.us-east-1.rds.amazonaws.com",
+    database: "postgres",
+    password: "berlinwoodek1",
     port: 5432,
 });
 const GetUserPassword = (body) => {
