@@ -5,9 +5,9 @@ const saltRounds = 10;
 
 const pool = new Pool({
     user: "postgres",
-    host: "localhost",
+    host: "slush.cjyaty8k3acu.us-east-1.rds.amazonaws.com",
     database: "Slush",
-    password: "root",
+    password: "berlinwoodek1",
     port: 5432,
 })
 
