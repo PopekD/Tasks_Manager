@@ -12,11 +12,34 @@ A simple task sharing application made for slush2023 junior fullstack developer 
 
 Libraries //
 
-Server:		    Client:										
-Dotenv		    React-Router-Dom	
-pg			      react-paginate
-jsonwebtoken	@chakra-ui/button
-bcrypt		    react-tabs
+Server:
+
+
+Dotenv	
+
+
+pg			
+
+
+jsonwebtoken	
+
+
+Client:
+
+
+react-tabs
+
+
+React-Router-Dom	
+
+
+react-paginate
+
+
+@chakra-ui/button
+
+
+bcrypt		
 
 # Database schema : 
 
