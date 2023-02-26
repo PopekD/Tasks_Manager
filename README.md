@@ -70,3 +70,11 @@ shared_exercises (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
+# Screenshots 
+![one](https://user-images.githubusercontent.com/94826253/221431571-985a9fa1-d35d-461e-9856-e29cacc0a002.png)
+![2](https://user-images.githubusercontent.com/94826253/221431575-3f33c2f9-b937-454a-ac08-81c77fb918d1.png)
+![3](https://user-images.githubusercontent.com/94826253/221431576-c94ed4d6-11c7-4835-9228-3a7848eea537.png)
+![4](https://user-images.githubusercontent.com/94826253/221431577-826d7f38-7223-4359-940f-a33596d2b602.png)
+![5](https://user-images.githubusercontent.com/94826253/221431578-792408d2-2926-453b-a369-5ef141f0b2ba.png)
+![6](https://user-images.githubusercontent.com/94826253/221431580-2b42c919-e07e-4f78-9b4e-3fbf95af7807.png)
+![7](https://user-images.githubusercontent.com/94826253/221431582-8228554f-eb44-4b22-beee-f1bd34c4d571.png)
