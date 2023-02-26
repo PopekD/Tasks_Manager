@@ -1,6 +1,6 @@
 # Slush2023_Tasks_Manager
 
-#Live Link: https://slush2023.herokuapp.com/
+#Live Link: Was posted at heroku. NOT ANYMORE.
 
 Web Application made for Slush 2023 interview.
 
