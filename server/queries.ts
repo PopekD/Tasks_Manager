@@ -4,11 +4,11 @@ const bcrypt = require('bcryptjs')
 const saltRounds = 10;
 
 const pool = new Pool({
-    user: "postgres",
-    host: "slush.cjyaty8k3acu.us-east-1.rds.amazonaws.com",
-    database: "postgres",
-    password: "berlinwoodek1",
-    port: 5432,
+    user: "",
+    host: "",
+    database: "",
+    password: "",
+    port: ,
 })
 
 const GetUserPassword = (body: any) => {
